@@ -31,11 +31,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.dynamicpayment.paymentexpress.DPSRequestBean;
 import com.payitnz.config.DBTables;
-import com.payitnz.config.DynamicPaymentConstant;
 import com.payitnz.model.AlipayAPIRequest;
 import com.payitnz.model.AlipayAPIResponse;
 import com.payitnz.model.AlipayWalletVO;
 import com.payitnz.model.GenericAPIResponse;
+import com.payitnz.model.RequestBean;
 import com.payitnz.model.User;
 
 @Repository
@@ -65,6 +65,82 @@ public class AlipayAPIDaoImpl implements AlipayAPIDao {
         namedParameterJdbcTemplate.update(sql, getSqlParameterByModel(alipayAPIRequest), keyHolder);
         alipayAPIRequest.setId(keyHolder.getKey().intValue());
 
+    }
+
+    @Override
+    public void savef2C(RequestBean alipayAPIRequest) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        String sql = "INSERT INTO request_flo2cash(id, userid, cmd, account_id, custom_data, return_url, notification_url, header_image, header_bottom_border, header_background_colour, store_card, display_customer_email, amount, reference, particular, url, mcPartnerTransId)"
+                + "VALUES (:id, :userid, :cmd, :account_id, :custom_data , :return_url , :notification_url, :header_image, :header_bottom_border, :header_background_colour, :store_card, :display_customer_email, :amount, :reference, :particular, :url, :mcPartnerTransId)";
+
+        namedParameterJdbcTemplate.update(sql, getSqlParameterByModelRequest(alipayAPIRequest), keyHolder);
+        alipayAPIRequest.setId(keyHolder.getKey().intValue());
+
+    }
+    @Override
+    public void savePolireq(RequestBean alipayAPIRequest) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        String sql = "INSERT INTO request_poli(id, userid, CurrencyCode, MerchantReference, MerchantHomepageURL, SuccessURL, FailureURL, CancellationURL, NotificationURL, url, mcPartnerTransId, Amount)"
+                + "VALUES (:id, :userid, :CurrencyCode, :MerchantReference, :MerchantHomepageURL , :SuccessURL , :FailureURL, :CancellationURL, :NotificationURL, :url, :mcPartnerTransId, :amount)";
+
+        namedParameterJdbcTemplate.update(sql, getSqlParameterByModelPoliRequest(alipayAPIRequest), keyHolder);
+        alipayAPIRequest.setId(keyHolder.getKey().intValue());
+
+    }
+    @Override
+	public void save(DPSRequestBean dpsRequest) {
+		// TODO Auto-generated method stub
+		 KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        String sql = "INSERT INTO "+DBTables.ALIPAY_DPS_REQUEST+" (id, merchant_id, PxPayKey, AmountInput, BillingId, CurrencyInput, EmailAddress, EnableAddBillCard, MerchantReference, Opt, TxnData1, TxnData2, TxnData3, TxnId, TxnType, UrlFail, UrlSuccess, request_time, ip_address, soft_delete) "
+                + "VALUES (:id, :merchantId, :pxPayKey, :amountInput, :billingId, :currencyInput, :emailAddress, :enableAddBillCard, :merchantReference, :opt, :txnData1, :txnData2, :txnData3, :txnId, :txnType, :urlFail, :urlSuccess, :requestTime, :ipAddress, :softDelete)";
+
+        namedParameterJdbcTemplate.update(sql, getSqlParameterByModel(dpsRequest), keyHolder);
+        dpsRequest.setId(keyHolder.getKey().intValue());
+	}
+    @Override
+    public void saveCUPreq(RequestBean alipayAPIRequest) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+//        
+//        id, userid, pgPartnerTransId, backEndUrl, charset, commodityDiscount, commodityName, commodityQuantity, commodityUnitPrice, 
+//        commodityUrl, customerIp, customerName, defaultBankNumber, defaultPayType, frontEndUrl, merAbbr, merId, merReserved, orderAmount,
+//        orderCurrency, orderNumber, orderTime, origQid, signMethod, signature, transTimeout, transType, transferFee, version, url
+        
+        
+        String sql = "INSERT INTO request_cup(id, userid, backEndUrl, charset, commodityDiscount, commodityName, commodityQuantity, commodityUnitPrice, commodityUrl,customerIp, customerName, defaultBankNumber, defaultPayType, frontEndUrl, merAbbr, merId, merReserved, orderAmount, orderCurrency, orderNumber, orderTime, origQid, signMethod, signature, transTimeout, transferFee, version, url, pgPartnerTransId)"
+                + "VALUES (:id, :userid, :backEndUrl, :charset, :commodityDiscount , :commodityName , :commodityQuantity, :commodityUnitPrice, :commodityUrl, :customerIp, :customerName, :defaultBankNumber, :defaultPayType, :frontEndUrl, :merAbbr, :merId, :merReserved, :orderAmount, :orderCurrency, :orderNumber, :orderTime, :origQid, :signMethod, :signature, :transTimeout, :transferFee, :version, :url, :pgPartnerTransId)";
+
+        namedParameterJdbcTemplate.update(sql, getSqlParameterByModelCUPRequest(alipayAPIRequest), keyHolder);
+        alipayAPIRequest.setId(keyHolder.getKey().intValue());
+
+    }
+    private SqlParameterSource getSqlParameterByModel(DPSRequestBean alipayAPIRequest) {
+
+	 	System.out.println("Merchant Id:"+alipayAPIRequest.getMerchantId());
+	 
+        MapSqlParameterSource paramSource = new MapSqlParameterSource();
+        paramSource.addValue("id", alipayAPIRequest.getId());
+        paramSource.addValue("merchantId", alipayAPIRequest.getMerchantId());
+        paramSource.addValue("pxPayKey", alipayAPIRequest.getPxPayKey());
+        paramSource.addValue("amountInput", alipayAPIRequest.getAmountInput());
+        paramSource.addValue("billingId", alipayAPIRequest.getBillingId());
+        paramSource.addValue("currencyInput", alipayAPIRequest.getCurrencyInput());
+        paramSource.addValue("emailAddress", alipayAPIRequest.getEmailAddress());
+        paramSource.addValue("enableAddBillCard", alipayAPIRequest.getEnableAddBillCard());
+        paramSource.addValue("merchantReference", alipayAPIRequest.getMerchantReference());
+        paramSource.addValue("opt", alipayAPIRequest.getOpt());
+        paramSource.addValue("txnData1", alipayAPIRequest.getTxnData1());
+        paramSource.addValue("txnData2", alipayAPIRequest.getTxnData2());
+        paramSource.addValue("txnData3", alipayAPIRequest.getTxnData3());
+        paramSource.addValue("txnId", alipayAPIRequest.getTxnId());
+        paramSource.addValue("txnType", alipayAPIRequest.getTxnType());
+        paramSource.addValue("urlFail", alipayAPIRequest.getUrlFail());
+        paramSource.addValue("urlSuccess", alipayAPIRequest.getUrlSuccess());	     
+        paramSource.addValue("requestTime", alipayAPIRequest.getRequestTime());
+        paramSource.addValue("ipAddress", alipayAPIRequest.getIpAddress());
+        paramSource.addValue("softDelete", alipayAPIRequest.getSoftDelete());
+
+        return paramSource;
     }
 
     private SqlParameterSource getSqlParameterByModel(AlipayAPIRequest alipayAPIRequest) {
@@ -106,12 +182,96 @@ public class AlipayAPIDaoImpl implements AlipayAPIDao {
         return paramSource;
     }
 
+    private SqlParameterSource getSqlParameterByModelRequest(RequestBean alipayAPIRequest) {
+
+        MapSqlParameterSource paramSource = new MapSqlParameterSource();
+        paramSource.addValue("id", alipayAPIRequest.getId());
+        paramSource.addValue("userid", alipayAPIRequest.getUserid());
+        paramSource.addValue("cmd", alipayAPIRequest.getCmd());
+        paramSource.addValue("account_id", alipayAPIRequest.getAccount_id());
+        paramSource.addValue("custom_data", alipayAPIRequest.getCustom_data());
+        paramSource.addValue("return_url", alipayAPIRequest.getReturn_url());
+        paramSource.addValue("notification_url", alipayAPIRequest.getF2c_notification_url());
+        paramSource.addValue("header_image", alipayAPIRequest.getHeader_image());
+        paramSource.addValue("header_bottom_border", alipayAPIRequest.getHeader_bottom_border());
+        paramSource.addValue("header_background_colour", alipayAPIRequest.getHeader_background_colour());
+        paramSource.addValue("store_card", alipayAPIRequest.getStore_card());
+        paramSource.addValue("display_customer_email", alipayAPIRequest.getDisplay_customer_email());
+        paramSource.addValue("amount", alipayAPIRequest.getAmount());
+        paramSource.addValue("reference", alipayAPIRequest.getReference());
+        paramSource.addValue("particular", alipayAPIRequest.getParticular());
+        paramSource.addValue("url", alipayAPIRequest.getUrl());
+        paramSource.addValue("mcPartnerTransId", alipayAPIRequest.getMcPartnerTransId());
+        return paramSource;
+    }
+    private SqlParameterSource getSqlParameterByModelPoliRequest(RequestBean alipayAPIRequest) {
+
+        MapSqlParameterSource paramSource = new MapSqlParameterSource();
+        paramSource.addValue("id", alipayAPIRequest.getId());
+        paramSource.addValue("userid", alipayAPIRequest.getUserid());
+        paramSource.addValue("cmd", alipayAPIRequest.getId());
+        paramSource.addValue("CurrencyCode", alipayAPIRequest.getCurrencyCode());
+        paramSource.addValue("MerchantReference", alipayAPIRequest.getMerchantReference());
+        paramSource.addValue("MerchantHomepageURL", alipayAPIRequest.getMerchantHomepageURL());
+        paramSource.addValue("SuccessURL", alipayAPIRequest.getSuccessURL());
+        paramSource.addValue("FailureURL", alipayAPIRequest.getFailureURL());
+        paramSource.addValue("CancellationURL", alipayAPIRequest.getCancellationURL());
+        paramSource.addValue("NotificationURL", alipayAPIRequest.getPoli_NotificationURL());
+        paramSource.addValue("amount", alipayAPIRequest.getAmount());
+        paramSource.addValue("url", alipayAPIRequest.getUrl());
+        paramSource.addValue("mcPartnerTransId", alipayAPIRequest.getMcPartnerTransId());
+        return paramSource;
+
+    }
+    
+    private SqlParameterSource getSqlParameterByModelCUPRequest(RequestBean alipayAPIRequest) {
+
+//      id, userid, pgPartnerTransId, backEndUrl, charset, commodityDiscount, commodityName, commodityQuantity, commodityUnitPrice, 
+//      commodityUrl, customerIp, customerName, defaultBankNumber, defaultPayType, frontEndUrl, merAbbr, merId, merReserved, orderAmount,
+//      orderCurrency, orderNumber, orderTime, origQid, signMethod, signature, transTimeout, transType, transferFee, version, url
+    	
+        MapSqlParameterSource paramSource = new MapSqlParameterSource();
+        paramSource.addValue("id", alipayAPIRequest.getId());
+        paramSource.addValue("userid", alipayAPIRequest.getUserid());
+        paramSource.addValue("backEndUrl", alipayAPIRequest.getBackEndUrl());
+        paramSource.addValue("charset", alipayAPIRequest.getCharset());
+        paramSource.addValue("commodityDiscount", alipayAPIRequest.getCommodityDiscount());
+        paramSource.addValue("commodityName", alipayAPIRequest.getCommodityName());
+        paramSource.addValue("commodityQuantity", alipayAPIRequest.getCommodityQuantity());
+        paramSource.addValue("commodityUnitPrice", alipayAPIRequest.getCommodityUnitPrice());
+        paramSource.addValue("commodityUrl", alipayAPIRequest.getCommodityUrl());
+        paramSource.addValue("customerIp", alipayAPIRequest.getCustomerIp());
+        paramSource.addValue("customerName", alipayAPIRequest.getCustomerName());
+        paramSource.addValue("defaultBankNumber", alipayAPIRequest.getDefaultBankNumber());
+        paramSource.addValue("defaultPayType", alipayAPIRequest.getDefaultPayType());
+        paramSource.addValue("frontEndUrl", alipayAPIRequest.getFrontEndUrl());
+        paramSource.addValue("merAbbr", alipayAPIRequest.getMerAbbr());
+        paramSource.addValue("merId", alipayAPIRequest.getMerId());
+        paramSource.addValue("merReserved", alipayAPIRequest.getMerReserved());
+        paramSource.addValue("orderAmount", alipayAPIRequest.getTransferFee());
+        paramSource.addValue("orderCurrency", alipayAPIRequest.getOrderCurrency());
+        paramSource.addValue("orderNumber", alipayAPIRequest.getOrderNumber());
+        paramSource.addValue("orderTime", alipayAPIRequest.getOrderTime());
+        paramSource.addValue("origQid", alipayAPIRequest.getOrigQid());
+        paramSource.addValue("signMethod", alipayAPIRequest.getSignMethod());
+        paramSource.addValue("signature", alipayAPIRequest.getSignature());
+
+        paramSource.addValue("transTimeout", alipayAPIRequest.getTransTimeout());
+        paramSource.addValue("transType", alipayAPIRequest.getTransType());
+        paramSource.addValue("transferFee", alipayAPIRequest.getTransferFee());
+        paramSource.addValue("version", alipayAPIRequest.getVersion());
+   
+        paramSource.addValue("url", alipayAPIRequest.getUrl());
+        paramSource.addValue("pgPartnerTransId", alipayAPIRequest.getMcPartnerTransId());
+        return paramSource;
+
+    }
     @Override
     public void save(AlipayAPIResponse alipayAPIResponse) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
-        System.out.println("id in saveorupdate");
-        String sql = "INSERT INTO AlipayAPI_Response(id, dy_merchant_id, pg_is_success, pg_sign, pg_sign_type, pg_result_code, pg_error, pg_alipay_buyer_login_id, pg_alipay_buyer_user_id, pg_partner_trans_id, pg_partner_refund_id, pg_alipay_trans_id, pg_alipay_pay_time, pg_alipay_reverse_time, pg_alipay_cancel_time, pg_transaction_date, mc_currency, mc_trans_name, mc_trans_amount, pg_exchange_rate, pg_trans_amount_cny, request_time, ip_address, request_by, soft_delete, infidigiUserId, transaction_type, method_type, remark) "
-                + "VALUES (:id, :dyMerchantId, :pgIsSuccess, :pgSign, :pgSignType, :pgResultCode, :pgError, :pgAlipayBuyerLoginId, :pgAlipayBuyerUserId, :pgPartnerTransId, :pgPartnerRefundId, :pgAlipayTransId , :pgAlipayPayTime, :pgAlipayReverseTime, :pgAlipayCancelTime, :pgTransactionDate, :mcCurrency, :mcTransName, :mcTransAmount, :pgExchangeRate, :pgTransAmountCny, :requestTime, :ipAddress, :requestBy, :softDelete, :infidigiUserId, :transaction_type, :method_type, remark)";
+        System.out.println("id in saveorupdate"+alipayAPIResponse.getId());
+        String sql = "INSERT INTO AlipayAPI_Response(id, dy_merchant_id, pg_is_success, pg_sign, pg_sign_type, pg_result_code, pg_error, pg_alipay_buyer_login_id, pg_alipay_buyer_user_id, pg_partner_trans_id, pg_partner_refund_id, pg_alipay_trans_id, pg_alipay_pay_time, pg_alipay_reverse_time, pg_alipay_cancel_time, pg_transaction_date, mc_currency, mc_trans_name, mc_trans_amount, pg_exchange_rate, pg_trans_amount_cny, request_time, ip_address, request_by, soft_delete, infidigiUserId, transaction_type, method_type, remark, reference) "
+                + "VALUES (:id, :dyMerchantId, :pgIsSuccess, :pgSign, :pgSignType, :pgResultCode, :pgError, :pgAlipayBuyerLoginId, :pgAlipayBuyerUserId, :pgPartnerTransId, :pgPartnerRefundId, :pgAlipayTransId , :pgAlipayPayTime, :pgAlipayReverseTime, :pgAlipayCancelTime, :pgTransactionDate, :mcCurrency, :mcTransName, :mcTransAmount, :pgExchangeRate, :pgTransAmountCny, :requestTime, :ipAddress, :requestBy, :softDelete, :infidigiUserId, :transaction_type, :method_type, :remark, :reference)";
 
         namedParameterJdbcTemplate.update(sql, getSqlParameterByModel(alipayAPIResponse), keyHolder);
         alipayAPIResponse.setId(keyHolder.getKey().intValue());
@@ -121,7 +281,7 @@ public class AlipayAPIDaoImpl implements AlipayAPIDao {
 		// TODO Auto-generated method stub
     	Map<String, Object> params = new HashMap<String, Object>();
 		params.put("id", alipayAPIResponse.getId());
-    	   String sql = "UPDATE AlipayAPI_Response SET id=:id, pg_result_code=:pgResultCode, pg_alipay_cancel_time=:pgAlipayCancelTime WHERE id=:id";
+    	   String sql = "UPDATE AlipayAPI_Response SET id=:id, pg_result_code=:pgResultCode, pg_alipay_cancel_time=:pgAlipayCancelTime, pg_is_success=:pgIsSuccess,cupReserved=:cupReserved, traceNumber=:traceNumber, mc_currency=:mcCurrency, pg_alipay_buyer_user_id=:pgAlipayBuyerUserId, orderNumber=:orderNumber, pg_alipay_trans_id=:pgAlipayTransId, settleCurrency=:settleCurrency, signMethod=:signMethod, pg_sign=:pgSign, pg_transaction_date=:pgTransactionDate, card_type=:card_type WHERE id=:id";
 
            namedParameterJdbcTemplate.update(sql, getSqlParameterByModel(alipayAPIResponse));
 		
@@ -149,7 +309,7 @@ public class AlipayAPIDaoImpl implements AlipayAPIDao {
         paramSource.addValue("mcCurrency", alipayAPIResponse.getMcCurrency());
         paramSource.addValue("mcTransName", alipayAPIResponse.getMcItemName());
         paramSource.addValue("mcTransAmount", alipayAPIResponse.getAmount());
-        System.out.println("Transaction amount ===="+alipayAPIResponse.getAmount());
+        System.out.println("Transaction amount ===="+alipayAPIResponse.getPgTransactionDate());
         paramSource.addValue("pgExchangeRate", alipayAPIResponse.getPgExchangeRate());
         paramSource.addValue("pgTransAmountCny", alipayAPIResponse.getPgTransAmountCny());
         paramSource.addValue("requestTime", alipayAPIResponse.getRequestTime());
@@ -159,7 +319,14 @@ public class AlipayAPIDaoImpl implements AlipayAPIDao {
         paramSource.addValue("infidigiUserId", alipayAPIResponse.getInfidigiUserId());
         paramSource.addValue("transaction_type", alipayAPIResponse.getTransaction_type());
         paramSource.addValue("method_type", alipayAPIResponse.getMethod_type());
-        paramSource.addValue("remark", alipayAPIResponse.getRemark());
+        paramSource.addValue("settleCurrency", alipayAPIResponse.getSettleCurrency());
+        paramSource.addValue("cupReserved", alipayAPIResponse.getCupReserved());
+        paramSource.addValue("orderNumber", alipayAPIResponse.getOrderNumber());
+        paramSource.addValue("signMethod", alipayAPIResponse.getSignMethod()); 
+        paramSource.addValue("traceNumber", alipayAPIResponse.getTraceNumber()); 
+        paramSource.addValue("remark", alipayAPIResponse.getRemark()); 
+        paramSource.addValue("reference", alipayAPIResponse.getReference());
+        paramSource.addValue("card_type", alipayAPIResponse.getCardType());
         
         return paramSource;
     }
@@ -402,7 +569,7 @@ public class AlipayAPIDaoImpl implements AlipayAPIDao {
     
     @Override
     public List<AlipayAPIResponse> getTransactionDetailsByCriteriaWeb(AlipayWalletVO alipayWalletVO) {
-        String sql = "select ars.id, ars.dy_merchant_id, ars.pg_is_success, ars.pg_result_code, ars.pg_error, ars.pg_alipay_buyer_login_id, ars.pg_alipay_buyer_user_id, ars.pg_partner_trans_id, ars.pg_partner_refund_id, ars.pg_alipay_trans_id, ars.pg_alipay_pay_time, ars.pg_alipay_reverse_time, ars.pg_alipay_cancel_time, ars.pg_transaction_date, ars.mc_currency, ars.mc_trans_name, ars.mc_trans_amount, ars.pg_exchange_rate, ars.pg_trans_amount_cny, ars.request_time,ars.method_type,ars.transaction_type, arq.mc_reference, arq.mc_comment, arq.mc_latitude, arq.mc_longitude, arq.mc_email, arq.mc_mobile, arq.mc_trans_amount from AlipayAPI_Response ars , AlipayAPI_Request arq where (arq.mc_partner_trans_id = ars.pg_partner_trans_id)";
+        String sql = "select * from AlipayAPI_Response ars where";
 
         StringBuffer whereClause = new StringBuffer("");
         boolean flag = true;
@@ -420,9 +587,9 @@ public class AlipayAPIDaoImpl implements AlipayAPIDao {
         if (!StringUtils.isEmpty(alipayWalletVO.getUserID())) {
             if(alipayWalletVO.getRole_id() == 2 || alipayWalletVO.getRole_id() == 3 || alipayWalletVO.getRole_id() == 1){
           		 {
-          			 if (flag) {
-                        whereClause.append(" AND ");
-                    }
+//          			 if (flag) {
+//                        whereClause.append(" AND ");
+//                    }
           			 if(alipayWalletVO.getRole_id() == 2 || alipayWalletVO.getRole_id() == 1)
           			 {
           			   whereClause.append(" ars.dy_merchant_id = ");
@@ -639,6 +806,7 @@ public class AlipayAPIDaoImpl implements AlipayAPIDao {
                         alipayAPIResponse.setInfidigiUserId(record.get("infidigiUserId") != null ? record.get("infidigiUserId").toString() : "");
                         alipayAPIResponse.setChannel(record.get("method_type") != null ? record.get("method_type").toString() : "");
                         alipayAPIResponse.setTransaction_type(record.get("transaction_type") != null ? record.get("transaction_type").toString() : "");
+                        alipayAPIResponse.setReference(record.get("reference") != null ? record.get("reference").toString() : "");
                         if(record.get("pg_transaction_date")!=null)
                         {
                         String s[]=record.get("pg_transaction_date").toString().split("\\.");
@@ -1312,51 +1480,5 @@ public class AlipayAPIDaoImpl implements AlipayAPIDao {
         }
         
     }
-	@Override
-	public void save(DPSRequestBean dpsRequest) {
-		// TODO Auto-generated method stub
-		 KeyHolder keyHolder = new GeneratedKeyHolder();
-
-        String sql = "INSERT INTO "+DBTables.ALIPAY_DPS_REQUEST+" (id, merchant_id, PxPayKey, AmountInput, BillingId, CurrencyInput, EmailAddress, EnableAddBillCard, MerchantReference, Opt, TxnData1, TxnData2, TxnData3, TxnId, TxnType, UrlFail, UrlSuccess, request_time, ip_address, soft_delete) "
-                + "VALUES (:id, :merchantId, :pxPayKey, :amountInput, :billingId, :currencyInput, :emailAddress, :enableAddBillCard, :merchantReference, :opt, :txnData1, :txnData2, :txnData3, :txnId, :txnType, :urlFail, :urlSuccess, :requestTime, :ipAddress, :softDelete)";
-
-        namedParameterJdbcTemplate.update(sql, getSqlParameterByModel(dpsRequest), keyHolder);
-        dpsRequest.setId(keyHolder.getKey().intValue());
-	}
-
-	@Override
-	public void update(DPSRequestBean dpsRequest) {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	 private SqlParameterSource getSqlParameterByModel(DPSRequestBean alipayAPIRequest) {
-
-		 	System.out.println("Merchant Id:"+alipayAPIRequest.getMerchantId());
-		 
-	        MapSqlParameterSource paramSource = new MapSqlParameterSource();
-	        paramSource.addValue("id", alipayAPIRequest.getId());
-	        paramSource.addValue("merchantId", alipayAPIRequest.getMerchantId());
-	        paramSource.addValue("pxPayKey", alipayAPIRequest.getPxPayKey());
-	        paramSource.addValue("amountInput", alipayAPIRequest.getAmountInput());
-	        paramSource.addValue("billingId", alipayAPIRequest.getBillingId());
-	        paramSource.addValue("currencyInput", alipayAPIRequest.getCurrencyInput());
-	        paramSource.addValue("emailAddress", alipayAPIRequest.getEmailAddress());
-	        paramSource.addValue("enableAddBillCard", alipayAPIRequest.getEnableAddBillCard());
-	        paramSource.addValue("merchantReference", alipayAPIRequest.getMerchantReference());
-	        paramSource.addValue("opt", alipayAPIRequest.getOpt());
-	        paramSource.addValue("txnData1", alipayAPIRequest.getTxnData1());
-	        paramSource.addValue("txnData2", alipayAPIRequest.getTxnData2());
-	        paramSource.addValue("txnData3", alipayAPIRequest.getTxnData3());
-	        paramSource.addValue("txnId", alipayAPIRequest.getTxnId());
-	        paramSource.addValue("txnType", alipayAPIRequest.getTxnType());
-	        paramSource.addValue("urlFail", alipayAPIRequest.getUrlFail());
-	        paramSource.addValue("urlSuccess", alipayAPIRequest.getUrlSuccess());	     
-	        paramSource.addValue("requestTime", alipayAPIRequest.getRequestTime());
-	        paramSource.addValue("ipAddress", alipayAPIRequest.getIpAddress());
-	        paramSource.addValue("softDelete", alipayAPIRequest.getSoftDelete());
-
-	        return paramSource;
-	    }
    
 }

@@ -2592,7 +2592,7 @@ public class DashboardController {
 							map.put("mcTransAmount",trans.getMcTransAmount());
 							map.put("pgMerchantTransactionId", trans.getPgMerchantTransactionId());
 							map.put("mcParticular",trans.getMcItemName());
-							map.put("mcReference",trans.getMcReference());
+							map.put("mcReference",trans.getReference());
 							map.put("status",trans.getPgResultCode());
 							transList.put(j,map);
 							j++;

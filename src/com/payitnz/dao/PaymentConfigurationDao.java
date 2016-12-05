@@ -28,6 +28,8 @@ public interface PaymentConfigurationDao {
 	void UpdateF2CRecord(AlipayWalletVO payData);
 
 	void SaveF2CRecord(AlipayWalletVO payData);
-
+	
 	public AlipayAPIResponse getTransactionByID(AlipayWalletVO paybean);
+
+
 }

@@ -79,9 +79,38 @@ public class AlipayAPIResponse extends GenericAPIResponse {
     
     String pgMerchantTransactionId;
     
+	String bank_name;
+    
+    String poli_payerAcc_number;
+    
+    String poli_payerAcc_sortCode;
+    
+    String poli_trans_ref_no;
+    
+	String  exchangeDate;
+    
+    String traceNumber;
+    
+    String settleCurrency;
+    
+    String cupReserved;
+    
+    String orderNumber;
+    
+    String signMethod;
+    
     String cardType;
     
-    public String getCardType() {
+    String reference;
+    public String getReference() {
+		return reference;
+	}
+
+	public void setReference(String reference) {
+		this.reference = reference;
+	}
+
+	public String getCardType() {
 		return cardType;
 	}
 
@@ -89,7 +118,89 @@ public class AlipayAPIResponse extends GenericAPIResponse {
 		this.cardType = cardType;
 	}
 
-	public AlipayAPIResponse[] getResList() {
+    public String getExchangeDate() {
+		return exchangeDate;
+	}
+
+	public void setExchangeDate(String exchangeDate) {
+		this.exchangeDate = exchangeDate;
+	}
+
+	public String getTraceNumber() {
+		return traceNumber;
+	}
+
+	public void setTraceNumber(String traceNumber) {
+		this.traceNumber = traceNumber;
+	}
+
+	public String getSettleCurrency() {
+		return settleCurrency;
+	}
+
+	public void setSettleCurrency(String settleCurrency) {
+		this.settleCurrency = settleCurrency;
+	}
+
+	public String getCupReserved() {
+		return cupReserved;
+	}
+
+	public void setCupReserved(String cupReserved) {
+		this.cupReserved = cupReserved;
+	}
+
+	public String getOrderNumber() {
+		return orderNumber;
+	}
+
+	public void setOrderNumber(String orderNumber) {
+		this.orderNumber = orderNumber;
+	}
+
+	public String getSignMethod() {
+		return signMethod;
+	}
+
+	public void setSignMethod(String signMethod) {
+		this.signMethod = signMethod;
+	}
+
+    
+    public String getBank_name() {
+		return bank_name;
+	}
+
+	public void setBank_name(String bank_name) {
+		this.bank_name = bank_name;
+	}
+
+	public String getPoli_payerAcc_number() {
+		return poli_payerAcc_number;
+	}
+
+	public void setPoli_payerAcc_number(String poli_payerAcc_number) {
+		this.poli_payerAcc_number = poli_payerAcc_number;
+	}
+
+	public String getPoli_payerAcc_sortCode() {
+		return poli_payerAcc_sortCode;
+	}
+
+	public void setPoli_payerAcc_sortCode(String poli_payerAcc_sortCode) {
+		this.poli_payerAcc_sortCode = poli_payerAcc_sortCode;
+	}
+
+	public String getPoli_trans_ref_no() {
+		return poli_trans_ref_no;
+	}
+
+	public void setPoli_trans_ref_no(String poli_trans_ref_no) {
+		this.poli_trans_ref_no = poli_trans_ref_no;
+	}
+
+    
+    public AlipayAPIResponse[] getResList() {
 		return resList;
 	}
 

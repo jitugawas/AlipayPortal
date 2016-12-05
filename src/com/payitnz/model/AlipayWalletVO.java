@@ -100,6 +100,26 @@ public class AlipayWalletVO {
 	
 	String gateway;
 	
+	String transaction_type;
+	
+	String paymentMethod;
+	
+	public String getPaymentMethod() {
+		return paymentMethod;
+	}
+
+	public void setPaymentMethod(String paymentMethod) {
+		this.paymentMethod = paymentMethod;
+	}
+
+	public String getTransaction_type() {
+		return transaction_type;
+	}
+
+	public void setTransaction_type(String transaction_type) {
+		this.transaction_type = transaction_type;
+	}
+
 	public String getGateway() {
 		return gateway;
 	}

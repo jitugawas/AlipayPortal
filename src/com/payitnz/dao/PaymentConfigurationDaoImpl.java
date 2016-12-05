@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.batch.api.partition.PartitionAnalyzer;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -216,6 +218,84 @@ public AlipayWalletVO getF2CRecord(AlipayWalletVO payConnection) {
        }
        return null;
 }
+
+@Override
+public AlipayAPIResponse getTransactionByID(AlipayWalletVO paybean) {
+	Map<String, Object> params = new HashMap<String, Object>();
+       params.put("id", paybean.getAlipayTransactionId());
+       
+       String sql = "SELECT * FROM "+DBTables.ALIPAY_TRANSACTIONS+" WHERE pg_partner_trans_id=:id ";
+       List<AlipayAPIResponse> result = null;
+       try {
+          
+           result = namedParameterJdbcTemplate.query(sql, params, new DPSTransactionMapper());
+           if(result.size() == 0) {
+               return null;
+           } else if(result.size() >=1) {
+           	for (AlipayAPIResponse paymentMethodInfo : result) {
+           		
+           		return paymentMethodInfo;
+           	}
+           	 
+           } 
+       } catch (EmptyResultDataAccessException e) {
+           // do nothing, return null
+       }
+       return null;
+}
+
+private static final class DPSTransactionMapper implements RowMapper<AlipayAPIResponse> {
+
+    public AlipayAPIResponse mapRow(ResultSet rs, int rowNum) throws SQLException {
+
+	       
+ 	   AlipayAPIResponse alipayAPIResponse  = new AlipayAPIResponse();
+ 	   alipayAPIResponse.setId(rs.getInt("id"));
+ 	   alipayAPIResponse.setDyMerchantId(rs.getString("dy_merchant_id"));
+        alipayAPIResponse.setPgIsSuccess(rs.getString("pg_is_success") );
+        alipayAPIResponse.setPgResultCode(rs.getString("pg_result_code") );
+        alipayAPIResponse.setPgError(rs.getString("pg_error"));             
+        alipayAPIResponse.setPgPartnerTransId(rs.getString("pg_partner_trans_id") );
+        alipayAPIResponse.setMerchantRefundId(rs.getString("pg_partner_refund_id") );
+        alipayAPIResponse.setPgAlipayTransId(rs.getString("pg_alipay_trans_id") );
+        alipayAPIResponse.setPgAlipayReverseTime(rs.getString("pg_alipay_reverse_time") );
+        alipayAPIResponse.setPgAlipayCancelTime(rs.getString("pg_alipay_cancel_time"));
+        alipayAPIResponse.setMcCurrency(rs.getString("mc_currency"));
+        alipayAPIResponse.setMcItemName(rs.getString("mc_trans_name"));
+        alipayAPIResponse.setMcTransAmount(rs.getString("mc_trans_amount"));
+        alipayAPIResponse.setPgExchangeRate(rs.getDouble("pg_exchange_rate"));
+        alipayAPIResponse.setPgTransAmountCny(rs.getDouble("pg_trans_amount_cny"));
+        alipayAPIResponse.setRequestTime(rs.getString("request_time"));
+        alipayAPIResponse.setPgAlipayBuyerLoginId(rs.getString("pg_alipay_buyer_login_id"));
+        alipayAPIResponse.setPgAlipayBuyerUserId(rs.getString("pg_alipay_buyer_user_id") );
+        alipayAPIResponse.setRequestTime(rs.getString("request_time"));
+        alipayAPIResponse.setIpAddress(rs.getString("ip_address") );
+        alipayAPIResponse.setInfidigiUserId(rs.getString("infidigiUserId"));
+        alipayAPIResponse.setChannel(rs.getString("method_type") );
+        alipayAPIResponse.setTransaction_type(rs.getString("transaction_type") );
+        if(rs.getString("pg_transaction_date")!=null)
+        {
+            String s[]=rs.getString("pg_transaction_date").toString().split("\\.");
+            alipayAPIResponse.setTransactionDate(rs.getString("pg_transaction_date") != null ? s[0] : "");
+            alipayAPIResponse.setPgAlipayPayTime(s[0]);
+        }
+        else
+        {
+        	alipayAPIResponse.setTransactionDate("");
+        	alipayAPIResponse.setPgAlipayPayTime("");
+        }
+        
+        alipayAPIResponse.setPgMerchantTransactionId(rs.getString("pg_merchant_transaction_id"));
+        alipayAPIResponse.setRemark(rs.getString("remark") );
+        
+			return alipayAPIResponse;
+    
+}
+    
+
+
+}
+
 
 
 private SqlParameterSource getSqlParameterByModelF2C(AlipayWalletVO payInfo) {
@@ -428,84 +508,6 @@ private static final class PoliMapper implements RowMapper<AlipayWalletVO> {
 	    	//   DPSpaygateway.setDPSStatus(rs.getBoolean("status"));
 
 				return DPSpaygateway;
-	       
-	   }
-	       
-
-	   
-	}
-	
-	
-	@Override
-	public AlipayAPIResponse getTransactionByID(AlipayWalletVO paybean) {
-		Map<String, Object> params = new HashMap<String, Object>();
-	       params.put("id", paybean.getAlipayTransactionId());
-	       
-	       String sql = "SELECT * FROM "+DBTables.ALIPAY_TRANSACTIONS+" WHERE pg_partner_trans_id=:id ";
-	       List<AlipayAPIResponse> result = null;
-	       try {
-	          
-	           result = namedParameterJdbcTemplate.query(sql, params, new DPSTransactionMapper());
-	           if(result.size() == 0) {
-	               return null;
-	           } else if(result.size() >=1) {
-	           	for (AlipayAPIResponse paymentMethodInfo : result) {
-	           		
-	           		return paymentMethodInfo;
-	           	}
-	           	 
-	           } 
-	       } catch (EmptyResultDataAccessException e) {
-	           // do nothing, return null
-	       }
-	       return null;
-	}
-	
-	private static final class DPSTransactionMapper implements RowMapper<AlipayAPIResponse> {
-
-	       public AlipayAPIResponse mapRow(ResultSet rs, int rowNum) throws SQLException {
-	 
-		       
-	    	   AlipayAPIResponse alipayAPIResponse  = new AlipayAPIResponse();
-	    	   alipayAPIResponse.setId(rs.getInt("id"));
-	    	   alipayAPIResponse.setDyMerchantId(rs.getString("dy_merchant_id"));
-               alipayAPIResponse.setPgIsSuccess(rs.getString("pg_is_success") );
-               alipayAPIResponse.setPgResultCode(rs.getString("pg_result_code") );
-               alipayAPIResponse.setPgError(rs.getString("pg_error"));             
-               alipayAPIResponse.setPgPartnerTransId(rs.getString("pg_partner_trans_id") );
-               alipayAPIResponse.setMerchantRefundId(rs.getString("pg_partner_refund_id") );
-               alipayAPIResponse.setPgAlipayTransId(rs.getString("pg_alipay_trans_id") );
-               alipayAPIResponse.setPgAlipayReverseTime(rs.getString("pg_alipay_reverse_time") );
-               alipayAPIResponse.setPgAlipayCancelTime(rs.getString("pg_alipay_cancel_time"));
-               alipayAPIResponse.setMcCurrency(rs.getString("mc_currency"));
-               alipayAPIResponse.setMcItemName(rs.getString("mc_trans_name"));
-               alipayAPIResponse.setMcTransAmount(rs.getString("mc_trans_amount"));
-               alipayAPIResponse.setPgExchangeRate(rs.getDouble("pg_exchange_rate"));
-               alipayAPIResponse.setPgTransAmountCny(rs.getDouble("pg_trans_amount_cny"));
-               alipayAPIResponse.setRequestTime(rs.getString("request_time"));
-               alipayAPIResponse.setPgAlipayBuyerLoginId(rs.getString("pg_alipay_buyer_login_id"));
-               alipayAPIResponse.setPgAlipayBuyerUserId(rs.getString("pg_alipay_buyer_user_id") );
-               alipayAPIResponse.setRequestTime(rs.getString("request_time"));
-               alipayAPIResponse.setIpAddress(rs.getString("ip_address") );
-               alipayAPIResponse.setInfidigiUserId(rs.getString("infidigiUserId"));
-               alipayAPIResponse.setChannel(rs.getString("method_type") );
-               alipayAPIResponse.setTransaction_type(rs.getString("transaction_type") );
-               if(rs.getString("pg_transaction_date")!=null)
-               {
-	               String s[]=rs.getString("pg_transaction_date").toString().split("\\.");
-	               alipayAPIResponse.setTransactionDate(rs.getString("pg_transaction_date") != null ? s[0] : "");
-	               alipayAPIResponse.setPgAlipayPayTime(s[0]);
-               }
-               else
-               {
-               	alipayAPIResponse.setTransactionDate("");
-               	alipayAPIResponse.setPgAlipayPayTime("");
-               }
-               
-               alipayAPIResponse.setPgMerchantTransactionId(rs.getString("pg_merchant_transaction_id"));
-               alipayAPIResponse.setRemark(rs.getString("remark") );
-               
-				return alipayAPIResponse;
 	       
 	   }
 	       

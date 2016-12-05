@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -26,21 +28,47 @@ import javax.json.JsonObjectBuilder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.xml.crypto.dsig.keyinfo.PGPData;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.soap.MessageFactory;
+import javax.xml.soap.MimeHeaders;
+import javax.xml.soap.SOAPBody;
+import javax.xml.soap.SOAPConnection;
+import javax.xml.soap.SOAPConnectionFactory;
+import javax.xml.soap.SOAPElement;
+import javax.xml.soap.SOAPEnvelope;
+import javax.xml.soap.SOAPException;
+import javax.xml.soap.SOAPMessage;
+import javax.xml.soap.SOAPPart;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.web.multipart.MultipartFile;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Text;
+import org.xml.sax.InputSource;
 
 import com.dynamicpayment.paymentexpress.DPSRequestBean;
 import com.dynamicpayment.paymentexpress.PxPay;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.payitnz.config.DynamicPaymentConstant;
 import com.payitnz.dao.AlipayAPIDao;
 import com.payitnz.model.AlipayAPIRequest;
 import com.payitnz.model.AlipayAPIResponse;
 import com.payitnz.model.AlipayWalletVO;
 import com.payitnz.model.GenericAPIResponse;
+import com.payitnz.model.RequestBean;
 import com.payitnz.model.User;
 import com.payitnz.util.Payment;
 import com.payitnz.util.XmlParser;
@@ -61,12 +89,27 @@ public class AlipayAPIServiceImpl implements AlipayAPIService {
         alipayAPIDao.save(alipayAPIRequest);
 
     }
+    @Override
+    public void savef2cReq(RequestBean alipayAPIRequest) {
+        alipayAPIDao.savef2C(alipayAPIRequest);
+
+    }
+    @Override
+    public void savePoliReq(RequestBean alipayAPIRequest) {
+        alipayAPIDao.savePolireq(alipayAPIRequest);
+
+    }
+    @Override
+    public void saveCUPReq(RequestBean alipayAPIRequest) {
+        alipayAPIDao.saveCUPreq(alipayAPIRequest);
+
+    }
 
     @Override
     public void saveOrUpdate(AlipayAPIResponse alipayAPIResponse) {
     	if(alipayAPIResponse.getId() == 0)
     	{
-    		alipayAPIDao.save(alipayAPIResponse);
+        alipayAPIDao.save(alipayAPIResponse);
     	}
     	else
     	{
@@ -75,13 +118,6 @@ public class AlipayAPIServiceImpl implements AlipayAPIService {
 
     }
 
-    @Override
-    public void saveOrUpdate(DPSRequestBean dpsRequest) {
-    	
-    		alipayAPIDao.save(dpsRequest);
-    	
-    }
-    
     @Override
 	public void UpdateUser(User user) {
 		alipayAPIDao.UpdateUser(user);
@@ -592,8 +628,8 @@ public class AlipayAPIServiceImpl implements AlipayAPIService {
     @Override
     public Model processF2C(AlipayWalletVO VO, Model model, AlipayWalletVO f2c, String ipAddress, String sender, HttpServletRequest request) {
 		JsonObjectBuilder jsonBuilder = Json.createObjectBuilder();
-		Random rand = new Random();
-		 long partnerTranId = Math.abs(rand.nextLong());
+//		Random rand = new Random();
+//		 long partnerTranId = Math.abs(rand.nextLong());
 		jsonBuilder.add("cmd", f2c.getF2c_service());
 		jsonBuilder.add("account_id", f2c.getF2c_account_id());
 		jsonBuilder.add("custom_data", f2c.getF2c_custom_data());
@@ -637,150 +673,340 @@ public class AlipayAPIServiceImpl implements AlipayAPIService {
 			jsonBuilder.add("display_customer_email", "0");
 		}
 		jsonBuilder.add("amount", VO.getAmount());
-		jsonBuilder.add("reference", partnerTranId);
+		jsonBuilder.add("reference", VO.getPgPartnerTransId());
 		jsonBuilder.add("particular", "${particular}");
 		model.addAttribute("amount", VO.getAmount());
-		model.addAttribute("reference", partnerTranId);
+		model.addAttribute("reference", VO.getPgPartnerTransId());
 		model.addAttribute("particular", "${particular}");
 		JsonObject jsonObject = jsonBuilder.build();
 		//transactionBean.setRequest(jsonObject.toString());
-//		 AlipayAPIRequest alipayAPIRequest = new AlipayAPIRequest();
-//	        alipayAPIRequest.setPgService(f2c.getF2c_service());
-//	        alipayAPIRequest.setPgSign(" ");
-//	        alipayAPIRequest.setPgSignType(" ");
-//	        alipayAPIRequest.setPgPartnerId(f2c.getAlipay_online_partner_id());
-//	        alipayAPIRequest.setPgInputCharset("");
-//	        alipayAPIRequest.setPgAlipaySellerId("");
-//	        alipayAPIRequest.setMcQuantityCommodity(0);
-//	        alipayAPIRequest.setMcTransName(VO.getParticular());
-//	        alipayAPIRequest.setMcReference(" ");
-//	        alipayAPIRequest.setMcComment(" ");
-//	        alipayAPIRequest.setMcLatitude(" ");
-//	        alipayAPIRequest.setMcLongitude(" ");
-//	        alipayAPIRequest.setMcEmail("");
-//	        alipayAPIRequest.setMcMobile("");
-//	        alipayAPIRequest.setMcPartnerTransId(""+partnerTranId);
-//	        alipayAPIRequest.setMcCurrency("");
-//	        alipayAPIRequest.setMcTransAmount(Double.parseDouble(VO.getAmount()));
-//	        alipayAPIRequest.setPgBuyerIdentityCode("");
-//	        alipayAPIRequest.setPgIdentityCodeType("");
-//	        alipayAPIRequest.setPgSendFormat(service);
-//	        alipayAPIRequest.setMcTransCreateTime(" ");
-//	        alipayAPIRequest.setMcMemo(" ");
-//	        alipayAPIRequest.setPgBizProduct("");
-//	        alipayAPIRequest.setPgExtendInfo(" ");
-//	        alipayAPIRequest.setIpAddress(ipAddress);
-//	        alipayAPIRequest.setRequestBy(sender);
-//	        
-//	        saveOrUpdate(alipayAPIRequest);
+
+		 RequestBean f2cAPIRequest = new RequestBean();
+		 f2cAPIRequest.setAmount(VO.getAmount());
+		 f2cAPIRequest.setAccount_id(f2c.getF2c_account_id());
+		 f2cAPIRequest.setCustom_data(f2c.getF2c_custom_data());
+		 f2cAPIRequest.setReturn_url(f2c.getF2c_return_url());
+		 f2cAPIRequest.setF2c_notification_url(f2c.getF2c_notification_url());
+		 f2cAPIRequest.setHeader_image(f2c.getHeader_image());
+		 f2cAPIRequest.setHeader_bottom_border(f2c.getHeader_bottom_border_color());
+		 f2cAPIRequest.setHeader_background_colour(f2c.getHeader_background_color());
+		 f2cAPIRequest.setStore_card(f2c.getStore_card());
+		 f2cAPIRequest.setDisplay_customer_email(f2c.getDisplay_customer_email());
+		 f2cAPIRequest.setReference(f2c.getF2c_merchant_reference());
+		 f2cAPIRequest.setParticular(VO.getParticular());
+		 f2cAPIRequest.setUserid(VO.getUser_id());
+		 f2cAPIRequest.setMcPartnerTransId(VO.getPgPartnerTransId());
+		 f2cAPIRequest.setUrl(DynamicPaymentConstant.FLO2CASHURL);	
+		
+		 savef2cReq(f2cAPIRequest);
 		return model;
 
 	}
+    public String processPoli(AlipayWalletVO shoppingCart, Model model, AlipayWalletVO poli, String ipAddress, String sender, HttpServletRequest request) {
+		String navigateURL = null;
+		try {
+			String webPage = DynamicPaymentConstant.PG_POLI_REGISTER_URL;
+
+			String accountId ="SS64005103"; //poli.getPoli_account_id();
+			String password = "Poli#Ahura$$16";//poli.getPassword();
+
+			//	            String accountId = poli.getPoli_account_id();
+			//	            String password = poli.getPassword();
+			Random rand = new Random();
+			 long partnerTranId = Math.abs(rand.nextLong());
+			String authString = accountId + ":" + password;
+			System.out.println("auth string: " + authString);
+			byte[] authEncBytes = Base64.encodeBase64(authString.getBytes());
+			String authStringEnc = new String(authEncBytes);
+			System.out.println("Base64 encoded auth string: " + authStringEnc);
+
+			URL obj = new URL(webPage);
+			HttpURLConnection urlConnection = (HttpURLConnection) obj.openConnection();
+			urlConnection.setRequestProperty("Authorization", "Basic " + authStringEnc);
+			urlConnection.setRequestMethod("POST");
+
+			JsonObjectBuilder jsonBuilder = Json.createObjectBuilder();
+			jsonBuilder.add("Amount", 10.00);
+			jsonBuilder.add("CurrencyCode", poli.getCurrency_code());
+			jsonBuilder.add("MerchantReference", shoppingCart.getPgPartnerTransId());
+			jsonBuilder.add("MerchantHomepageURL", DynamicPaymentConstant.SERVER_HOST + DynamicPaymentConstant.SERVER_SITE_URL);
+			jsonBuilder.add("SuccessURL", DynamicPaymentConstant.SERVER_HOST + DynamicPaymentConstant.SERVER_SITE_URL+"poliResponse");
+			jsonBuilder.add("FailureURL", "");
+			jsonBuilder.add("CancellationURL", "");
+			jsonBuilder.add("NotificationURL", "");
+
+			JsonObject jsonObject = jsonBuilder.build();
+			 RequestBean poliAPIRequest = new RequestBean();
+			 poliAPIRequest.setAmount(shoppingCart.getAmount());
+		
+			 poliAPIRequest.setParticular(shoppingCart.getParticular());
+			 poliAPIRequest.setUserid(shoppingCart.getUser_id());
+			 poliAPIRequest.setMcPartnerTransId(shoppingCart.getPgPartnerTransId());
+			 poliAPIRequest.setCurrencyCode(poli.getCurrency_code());
+			 poliAPIRequest.setMerchantReference(poli.getPoli_merchant_reference());
+			 poliAPIRequest.setSuccessURL(poli.getPoli_success_url());
+			 poliAPIRequest.setMerchantHomepageURL(poli.getPoli_homepage_url());
+			 poliAPIRequest.setFailureURL(poli.getPoli_failure_url());
+			 poliAPIRequest.setCancellationURL(poli.getAlipay_online_cancellation_url());
+			 poliAPIRequest.setPoli_NotificationURL(poli.getPoli_notification_url());
+			
+			 savePoliReq(poliAPIRequest);
+			//transactionBean.setRequest(jsonObject.toString());
+			System.out.println("jsonBuilder : " + jsonObject.toString());
+
+			// Send post request
+			urlConnection.setDoOutput(true);
+			urlConnection.setDoInput(true);
+			urlConnection.setRequestProperty("Content-Type", "application/json");
+
+			DataOutputStream wr = new DataOutputStream(urlConnection.getOutputStream());
+			wr.writeBytes(jsonObject.toString());
+			wr.flush();
+			wr.close();
+
+
+			int responseCode = urlConnection.getResponseCode();
+			System.out.println("\nSending 'POST' request to URL : " + webPage);
+
+			System.out.println("Response Code : " + responseCode);
+			if(responseCode == 400 || responseCode == 401)
+			{
+				navigateURL = "";
+
+			}
+			else
+			{
+				BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+				String inputLine;
+				StringBuffer response = new StringBuffer();
+
+				while ((inputLine = in.readLine()) != null) {
+					response.append(inputLine);
+				}
+				in.close();
+
+				// print result
+				System.out.println(response.toString());
+				ObjectMapper mapper = new ObjectMapper();
+				Map<String, Object> map = mapper.readValue(response.toString(), new TypeReference<Map<String, Object>>() {
+				});
+
+				navigateURL = (String) map.get("NavigateURL");
+				System.out.println("---map=" + map);
+
+			}
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return navigateURL;
+	}
     
     @Override
-	public String processDPS(AlipayWalletVO alipay, Model model, AlipayWalletVO dps, String ipAddress, String sender,
-			HttpServletRequest request) {
-		//	        String PxPayUrl = "https://uat.paymentexpress.com/pxaccess/pxpay.aspx";
-		//	        String PxPayUserId = "AhuraConsulting_Dev";
-		//	        String PxPayKey = "78efe7aad82db9354675fea0c9fa9484d5cdeaeee1be6ad90939ce74f8c14c98";
+   	public String processDPS(AlipayWalletVO alipay, Model model, AlipayWalletVO dps, String ipAddress, String sender,
+   			HttpServletRequest request) {
+   		//	        String PxPayUrl = "https://uat.paymentexpress.com/pxaccess/pxpay.aspx";
+   		//	        String PxPayUserId = "AhuraConsulting_Dev";
+   		//	        String PxPayKey = "78efe7aad82db9354675fea0c9fa9484d5cdeaeee1be6ad90939ce74f8c14c98";
 
-    	HttpSession session = request.getSession();    	
-    	session.setAttribute("userId", alipay.getUser_id());
-    	
-		System.out.println(dps.getPxPayUrl());
-		System.out.println(dps.getPxPayUserId());
-		System.out.println(dps.getPxPayKey());
-		String PxPayUrl = dps.getPxPayUrl();
-		String PxPayUserId = dps.getPxPayUserId();
-		String PxPayKey = dps.getPxPayKey();
+       	HttpSession session = request.getSession();    	
+       	session.setAttribute("userId", alipay.getUser_id());
+       	
+   		System.out.println(dps.getPxPayUrl());
+   		System.out.println(dps.getPxPayUserId());
+   		System.out.println(dps.getPxPayKey());
+   		String PxPayUrl = dps.getPxPayUrl();
+   		String PxPayUserId = dps.getPxPayUserId();
+   		String PxPayKey = dps.getPxPayKey();
 
-		//	        Double amt = Double.valueOf(shoppingCart.getAmount());
-		//	        int amount = amt.intValue();
-		// number = temp.doubleValue();
+   		//	        Double amt = Double.valueOf(shoppingCart.getAmount());
+   		//	        int amount = amt.intValue();
+   		// number = temp.doubleValue();
 
-		 Random rand = new Random();
-		 long partnerTranId = Math.abs(rand.nextLong());
-		 
-		DPSRequestBean gr = new DPSRequestBean();
+   		 Random rand = new Random();
+   		 long partnerTranId = Math.abs(rand.nextLong());
+   		 
+   		DPSRequestBean gr = new DPSRequestBean();
 
-		gr.setCurrencyInput("USD");
-		gr.setEmailAddress("");
-		gr.setMerchantId(alipay.getUser_id());
-		gr.setPxPayKey(PxPayKey);
-		gr.setPxPayUserId(PxPayUserId);
-		
-		System.out.println("Amount:"+alipay.getAmount().toString());
-		
-		DecimalFormat df = new DecimalFormat("#.00"); 
-		String amount = df.format(Double.valueOf(alipay.getAmount()));
-		System.out.println("amount"+ amount);
-		gr.setAmountInput(amount);
-		gr.setIpAddress(ipAddress);
-		gr.setBillingId("");
-		gr.setEnableAddBillCard(0);
-		gr.setMerchantReference(String.valueOf(partnerTranId));
-		gr.setOpt("");
-		gr.setTxnData1("");
-		gr.setTxnData2("");
-		gr.setTxnData3("");
-		gr.setTxnId("");
-		gr.setTxnType("Purchase");
-		gr.setUrlFail(DynamicPaymentConstant.SERVER_HOST+DynamicPaymentConstant.SERVER_SITE_URL+"dpsResponse");
-		gr.setUrlSuccess(DynamicPaymentConstant.SERVER_HOST+DynamicPaymentConstant.SERVER_SITE_URL+"dpsResponse");
-		String redirectUrl = PxPay.GenerateRequest(PxPayUserId, PxPayKey, gr, PxPayUrl);
-		String inputXml = gr.getXml();
-		//transactionBean.setRequest(inputXml);
-		System.out.println(inputXml);
-		System.out.println("redirect url"+ redirectUrl);
-		//int status = hc.storeTransaction(bean);
+   		gr.setCurrencyInput("USD");
+   		gr.setEmailAddress("");
+   		gr.setMerchantId(alipay.getUser_id());
+   		gr.setPxPayKey(PxPayKey);
+   		gr.setPxPayUserId(PxPayUserId);
+   		
+   		System.out.println("Amount:"+alipay.getAmount().toString());
+   		
+   		DecimalFormat df = new DecimalFormat("#.00"); 
+   		String amount = df.format(Double.valueOf(alipay.getAmount()));
+   		System.out.println("amount"+ amount);
+   		gr.setAmountInput(amount);
+   		gr.setIpAddress(ipAddress);
+   		gr.setBillingId("");
+   		gr.setEnableAddBillCard(0);
+   		gr.setMerchantReference(String.valueOf(partnerTranId));
+   		gr.setOpt("");
+   		gr.setTxnData1("");
+   		gr.setTxnData2("");
+   		gr.setTxnData3("");
+   		gr.setTxnId("");
+   		gr.setTxnType("Purchase");
+   		gr.setUrlFail(DynamicPaymentConstant.SERVER_HOST+DynamicPaymentConstant.SERVER_SITE_URL+"dpsResponse");
+   		gr.setUrlSuccess(DynamicPaymentConstant.SERVER_HOST+DynamicPaymentConstant.SERVER_SITE_URL+"dpsResponse");
+   		String redirectUrl = PxPay.GenerateRequest(PxPayUserId, PxPayKey, gr, PxPayUrl);
+   		String inputXml = gr.getXml();
+//   		transactionBean.setRequest(inputXml);
+   		System.out.println(inputXml);
+   		System.out.println("redirect url"+ redirectUrl);
+//   		int status = hc.storeTransaction(bean);
 
-		alipayAPIDao.save(gr);
-		
-		AlipayAPIResponse alipayAPIResponse = new AlipayAPIResponse();
-		
-		
-		 
-		 alipayAPIResponse.setDyMerchantId(alipay.getUser_id());
-         alipayAPIResponse.setPgIsSuccess("");
-         alipayAPIResponse.setPgResultCode("");
-         alipayAPIResponse.setPgError("");             
-         alipayAPIResponse.setPgPartnerTransId(new StringBuffer().append(partnerTranId).toString());
-         alipayAPIResponse.setMerchantRefundId("");
-         alipayAPIResponse.setPgAlipayTransId("" );
-         alipayAPIResponse.setPgAlipayReverseTime("");
-         alipayAPIResponse.setPgAlipayCancelTime("");
-         alipayAPIResponse.setMcCurrency("USD");
-         alipayAPIResponse.setMcItemName("");
-         alipayAPIResponse.setMcTransAmount(alipay.getAmount());
-         alipayAPIResponse.setPgExchangeRate(0.00);
-         alipayAPIResponse.setPgTransAmountCny(0.00);
-         alipayAPIResponse.setAmount(amount);
-         alipayAPIResponse.setIpAddress(ipAddress);
-         alipayAPIResponse.setRemark(sender);
-         
-         DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");         
-         //to convert Date to String, use format method of SimpleDateFormat class.
-         String strDate = dateFormat.format(new Date());
-         alipayAPIResponse.setRequestTime(strDate);
-         alipayAPIResponse.setMcReference(alipay.getReference());
-         alipayAPIResponse.setMcComment("" );
-         alipayAPIResponse.setMcLatitude("");
-         alipayAPIResponse.setMcLongitude("" );
-         alipayAPIResponse.setMcEmail(alipay.getEmail());
-         alipayAPIResponse.setMcMobile("");
-         alipayAPIResponse.setInfidigiUserId(alipay.getInfidigiAccountId());
-         alipayAPIResponse.setChannel("DPS" );
-         alipayAPIResponse.setTransaction_type("1");    
-         alipayAPIResponse.setTransactionDate("");
-     	 alipayAPIResponse.setPgAlipayPayTime("");         
-         alipayAPIResponse.setPgMerchantTransactionId("");
-         
-         alipayAPIDao.save(alipayAPIResponse);
-         
- 		 model.addAttribute("redirect_url", redirectUrl);
-		 return redirectUrl;
+   		alipayAPIDao.save(gr);
+   		
+   		AlipayAPIResponse alipayAPIResponse = new AlipayAPIResponse();
+   		
+   		
+   		 
+   		 alipayAPIResponse.setDyMerchantId(alipay.getUser_id());
+            alipayAPIResponse.setPgIsSuccess("T");
+            alipayAPIResponse.setPgResultCode("FAILED");
+            alipayAPIResponse.setPgError("");             
+            alipayAPIResponse.setPgPartnerTransId(new StringBuffer().append(partnerTranId).toString());
+            alipayAPIResponse.setMerchantRefundId("");
+            alipayAPIResponse.setPgAlipayTransId("" );
+            alipayAPIResponse.setPgAlipayReverseTime("");
+            alipayAPIResponse.setPgAlipayCancelTime("");
+            alipayAPIResponse.setMcCurrency("USD");
+            alipayAPIResponse.setMcItemName("");
+            alipayAPIResponse.setMcTransAmount(alipay.getAmount());
+            alipayAPIResponse.setPgExchangeRate(0.00);
+            alipayAPIResponse.setPgTransAmountCny(0.00);
+            alipayAPIResponse.setAmount(amount);
+            alipayAPIResponse.setIpAddress(ipAddress);
+            alipayAPIResponse.setRemark(sender);
+            alipayAPIResponse.setPgTransactionDate(new Date());
+            DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");         
+            //to convert Date to String, use format method of SimpleDateFormat class.
+            String strDate = dateFormat.format(new Date());
+            alipayAPIResponse.setRequestTime(strDate);
+            alipayAPIResponse.setMcReference(alipay.getReference());
+            alipayAPIResponse.setMcComment("" );
+            alipayAPIResponse.setMcLatitude("");
+            alipayAPIResponse.setMcLongitude("" );
+            alipayAPIResponse.setMcEmail(alipay.getEmail());
+            alipayAPIResponse.setMcMobile("");
+            alipayAPIResponse.setInfidigiUserId(alipay.getInfidigiAccountId());
+            alipayAPIResponse.setMethod_type("DPS" );
+            alipayAPIResponse.setTransaction_type("1");    
+            alipayAPIResponse.setTransactionDate("");
+        	 alipayAPIResponse.setPgAlipayPayTime("");   
+        	 
+            alipayAPIResponse.setPgMerchantTransactionId("");
+            
+            alipayAPIDao.save(alipayAPIResponse);
+            
+    		 model.addAttribute("redirect_url", redirectUrl);
+   		 return redirectUrl;
 
-	}
+   	}
+    
+//    @Override
+//    public SOAPMessage createSOAPRequest() {
+//       
+//        SOAPMessage soapMessage = null;
+//		try {
+//			  MessageFactory messageFactory = MessageFactory.newInstance();
+//				soapMessage = messageFactory.createMessage();
+//				SOAPPart soapPart = soapMessage.getSOAPPart();
+//
+//		        String serverURI = "https://uat.paymentexpress.com";
+//
+//		        // SOAP Envelope
+//			   	   SOAPEnvelope envelope = soapPart.getEnvelope();
+//			      // envelope.addNamespaceDeclaration("example", serverURI);
+//			       envelope.addNamespaceDeclaration("xsi", "http://www.w3.org/2001/XMLSchema-instance");
+//			       envelope.addNamespaceDeclaration("xsd", "http://www.w3.org/2001/XMLSchema");
+//			     
+//			       SOAPBody soapBody = envelope.getBody();
+//			
+//		       DPSRequestBean gr = new DPSRequestBean();
+//	           
+//	      		gr.setCurrencyInput("USD");
+//	      		gr.setEmailAddress("");
+//	      		gr.setMerchantId("");
+//	      		gr.setPxPayKey("88fa23ad75f57cc6175575303127dd1271099b54d75cf141e63a579c9309005d");
+//	      		gr.setPxPayUserId("EyegateServicesDev");
+//	      		
+//	      	//	System.out.println("Amount:"+alipay.getAmount().toString());
+//	      		
+//	      		DecimalFormat df = new DecimalFormat("#.00"); 
+//	      		String amount = "10.00";
+//	      		System.out.println("amount"+ amount);
+//	      		gr.setAmountInput(amount);
+//	      		gr.setIpAddress("");
+//	      		gr.setBillingId("");
+//	      		gr.setEnableAddBillCard(0);
+//	      		gr.setMerchantReference("merchant");
+//	      		gr.setOpt("");
+//	      		gr.setTxnData1("");
+//	      		gr.setTxnData2("");
+//	      		gr.setTxnData3("");
+//	      		gr.setTxnId("");
+//	      		gr.setTxnType("Purchase");
+//	      		gr.setUrlFail(DynamicPaymentConstant.SERVER_HOST+DynamicPaymentConstant.SERVER_SITE_URL+"dpsResponse");
+//	      		gr.setUrlSuccess(DynamicPaymentConstant.SERVER_HOST+DynamicPaymentConstant.SERVER_SITE_URL+"dpsResponse");
+//	   		//String redirectUrl = PxPay.GenerateRequest("EyegateServicesDev", "88fa23ad75f57cc6175575303127dd1271099b54d75cf141e63a579c9309005d", gr, "https://uat.paymentexpress.com/pxaccess/pxpay.aspx");
+//	      		
+//
+//	      		SOAPElement soapBodyElem = soapBody.addChildElement("SubmitTransaction", "https://uat.paymentexpress.com");
+//	      		SOAPElement soapBodyElem1 = soapBodyElem.addChildElement("email", "example");
+//	         	soapBodyElem1.addTextNode("mutantninja@gmail.com");	   	
+//	      	
+////	      		Document doc = convertStringToDocument(xml);
+////	      		soapBody.addDocument(doc);
+//				 MimeHeaders headers = soapMessage.getMimeHeaders();
+//			        headers.addHeader("SOAPAction", serverURI  + "SubmitTransaction");
+//
+//			        soapMessage.saveChanges();
+//
+//			        /* Print the request message */
+//			        System.out.print("Request SOAP Message = ");
+//			        soapMessage.writeTo(System.out);
+//			        System.out.println();
+//  
+//	//
+//		} catch (Exception e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+// 
+//
+//       
+//        return soapMessage;
+//    }
+  
+    private static Document convertStringToDocument(String xmlStr) {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder;
+        try {
+            builder = factory.newDocumentBuilder();
+            Document doc = builder.parse(new InputSource(new StringReader(xmlStr)));
+            return doc;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    @Override
+    public void printSOAPResponse(SOAPMessage soapResponse) throws Exception {
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        Transformer transformer = transformerFactory.newTransformer();
+        Source sourceContent = soapResponse.getSOAPPart().getContent();
+        System.out.print("\nResponse SOAP Message = ");
+        StreamResult result = new StreamResult(System.out);
+        transformer.transform(sourceContent, result);
+    }
 
     @Override
     public Object[] createCancelTransaction(AlipayWalletVO alipayWalletVO, String ipAddress, String sender) {

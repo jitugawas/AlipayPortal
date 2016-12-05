@@ -57,7 +57,11 @@ public class DynamicPaymentConstant {
     
     public static final String METHOD_OFFLINE = "offline"; 
  	public static final String METHOD_ONLINE ="online";
- 	
+ 	 public static final String METHOD_VISA = "3"; 
+  	public static final String METHOD_AMERICAN_EXP ="6";
+	public static final String METHOD_DINERS_CLUB ="5";
+	public static final String METHOD_MASTER_CARD ="4";
+	public static final String METHOD_CUP ="7";
 	public static final String ALIPAY_PORTAL_ACCOUNT = "123011123456700";
 	
     //localhost dev-atul
@@ -78,10 +82,10 @@ public class DynamicPaymentConstant {
     
     
   	//test server
-// 	public static final String SERVER_HOST = "http://www.ivaultit.com/";
-// 	public static final String SITE_URL = "PayitnzMN";
-// 	public static final String SERVER_SITE_URL = "PayitnzMN/"; 
-    	    
+ 	/*public static final String SERVER_HOST = "http://www.ivaultit.com/";
+ 	public static final String SITE_URL = "PayitnzMN";
+ 	public static final String SERVER_SITE_URL = "PayitnzMN/"; 
+    	*/    
   	public static final String SITE_BASE_URL = SERVER_HOST+SITE_URL;
   	//file upload path
   	
@@ -136,25 +140,29 @@ public class DynamicPaymentConstant {
 	public static final String FTP_DESTINATION_PATH = "/home/tehmus/public_html/temp/userFiles/";
 	public static final String SETTLEMENT_DESTINATION_PATH = "/home/tehmus/public_html/temp/userFiles/";
 	public static final String SETTLEMENT_CREDIT_FILE_PATH = "/home/tehmus/public_html/temp/settlementCreditFiles/";
-	public static final String FLO2CASHURL = "https://demo.flo2cash.co.nz/web2pay/default.aspx";
-//	public static final String DB_USER = "tehmus_teamq";
-//	public static final String DB_PASSWORD = "teamq@1234";
-//	public static final String DB_NAME = "tehmus_payitnz";
-//	public static final String DB_URL = "jdbc:mysql://mysql1000.mochahost.com:3306/"+DB_NAME;
 	
+	
+	
+	public static final String FLO2CASHURL = "https://demo.flo2cash.co.nz/web2pay/default.aspx";
+	public static final String PG_POLI_REGISTER_URL = "https://poliapi.apac.paywithpoli.com/api/Transaction/Initiate";
+	public static final String PG_POLI_GET_TRANSACTION_URL =  "https://poliapi.apac.paywithpoli.com/api/Transaction/GetTransaction";
+	
+	/*public static final String DB_USER = "tehmus_teamq";
+	public static final String DB_PASSWORD = "teamq@1234";
+	public static final String DB_NAME = "tehmus_payitnz";
+	public static final String DB_URL = "jdbc:mysql://mysql1000.mochahost.com:3306/"+DB_NAME;
+	*/
+	
+//	public static final String DB_USER = "root";
+//	public static final String DB_PASSWORD = "s3cure";
+//	public static final String DB_NAME = "tehmus_pilotdpa";
+//	public static final String DB_URL = "jdbc:mysql://localhost:3306/"+DB_NAME;
 	
 	public static final String DB_USER = "root";
 	public static final String DB_PASSWORD = "";
 	public static final String DB_NAME = "tehmus_pilotdpa";
 	public static final String DB_URL = "jdbc:mysql://localhost:3306/"+DB_NAME;
-	
-	
-/*	public static final String DB_USER = "root";
-	public static final String DB_PASSWORD = "";
-	public static final String DB_NAME = "tehmus_payitnz";
-	public static final String DB_URL = "jdbc:mysql://localhost:3306/"+DB_NAME;
-	*/
-	
+		
 	public static final String EMAIL_REGARDS = "PayitNZ Portal Team";
 	
 	//Settlement Statuses
@@ -185,10 +193,23 @@ public class DynamicPaymentConstant {
 	public static final String TRANSACTION_PG_FAILED = "FAILED";	
 	public static final String TRANSACTION_PG_REVERSAL = "REVERSAL";
 	public static final String TRANSACTION_PG_CANCELLED = "CANCELLED";
-
+	
+	
 	public static final String DPS_METHOD = "DPS";
 	
 	public static final String CARD_VISA = "VISA";
+	
+	
+	public static final String TWILIO_ACCOUNT_SID = "ACb9c3b99ef5d00d8d6dda1a56d0252dcf";
+	public static final String TWILIO_ACCOUNT_TOKEN = "e909038367a9c2f21f70ce326b75008e";
+	
+	public static final String TWILIO_API_KEY = "SKc697d30b72e4d509f4eb6b246d7f0cd4";
+	public static final String TWILIO_API_SECRET = "HracRd818u98rwGdXwKiXYy7XpvgAeHY";
+	
+	
+	public static final String TWILIO_FROM_NO = "+14806300278";
+	public static final String TWILIO_TO_NO = "+917744834998";
+	
 	
     //-------------------------------- CONSTANT METHODS----------------------------------
 

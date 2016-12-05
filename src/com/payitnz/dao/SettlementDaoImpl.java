@@ -39,6 +39,7 @@ import com.payitnz.model.SettlementBean;
 import com.payitnz.model.SettlementFileBean;
 import com.payitnz.model.TransactionBean;
 import com.payitnz.model.User;
+import com.payitnz.util.TwilioSMSApi;
 
 @Repository
 public class SettlementDaoImpl implements SettlementDao {
@@ -47,7 +48,8 @@ public class SettlementDaoImpl implements SettlementDao {
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 	DynamicPaymentConstant costant = new DynamicPaymentConstant();
     EmailAlertsConfigBean alertBean = costant.getAlertConfiguration(); 
-	    
+	TwilioSMSApi smsApi = new TwilioSMSApi();
+	
 	private static final Logger logger = Logger.getLogger(SettlementDaoImpl.class);
 	
 	@Autowired
@@ -187,6 +189,15 @@ public class SettlementDaoImpl implements SettlementDao {
 	     				}
    	     				
    	     			}
+   	     			
+	   	     		if(alertBean.getIs_settle_reconcile_phone_number()>0){
+	   	     			
+	   	     			String message = "Successfully settled "+settlementFileBean.getTransactionCount()+" transactions for credit file "+settlementFileBean.getCreditFile();
+	   	     			String toNumber = alertBean.getSettle_reconcile_phone_number();
+	   	     			if(!toNumber.isEmpty())
+	   	     			smsApi.sendSMSAlert(message,toNumber);
+	   	     			
+	   	     		}
 				}
 			}else{
 				logger.error("Failed to validate settlement file and generate credit file");
@@ -348,6 +359,14 @@ public class SettlementDaoImpl implements SettlementDao {
 					   	     			 }
 				   	     			}
 			   	     			
+					   	     		if(alertBean.getIs_settle_reconcile_phone_number()>0){
+					   	     			
+					   	     			String message = " Failed to settled transaction with tran id: "+reconcileBean.getPartnerTransactionId();
+					   	     			String toNumber = alertBean.getSettle_reconcile_phone_number();
+					   	     			if(!toNumber.isEmpty())
+					   	     			smsApi.sendSMSAlert(message,toNumber);
+					   	     			
+					   	     		}
 			   	     			
 		   			 	    }else{
 		   			 	    	

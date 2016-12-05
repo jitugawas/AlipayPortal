@@ -4,6 +4,7 @@ import java.io.StringWriter;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.soap.SOAPElement;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -63,7 +64,7 @@ public class DPSRequestBean {
 		  
 	  }
     
-	  private void buildXml()
+	  private void buildXml(String soapBodyElem)
 	  {
 		  
 		  try
@@ -72,7 +73,7 @@ public class DPSRequestBean {
 			  DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 			  Document doc = docBuilder.newDocument();
 	
-			  Element root = doc.createElement("GenerateRequest");
+			  Element root = doc.createElement("transactionDetails");
 			  doc.appendChild(root);
 			  
 	
@@ -207,7 +208,150 @@ public class DPSRequestBean {
 			  e.printStackTrace();
 		  }
 	}
-	  
+	  private void buildXml()
+	  {
+		  
+		  try
+			  {
+			  
+			  DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+			  Document doc = docBuilder.newDocument();
+
+			  Element root = doc.createElement("GenerateRequest");
+			  doc.appendChild(root);
+			  
+
+			  	Element child;
+			  	Text text;
+			  	
+			  	child = doc.createElement("PxPayUserId");
+			  	root.appendChild(child);	  	
+			  	text = doc.createTextNode(this.getPxPayUserId());
+			  	child.appendChild(text);	  		  	
+			  	
+			  	System.out.println(this.getPxPayUserId());
+			  	
+			  	child = doc.createElement("PxPayKey");
+			  	root.appendChild(child);	  	
+			  	text = doc.createTextNode(this.getPxPayKey());
+			  	child.appendChild(text);	  	
+		  	
+				System.out.println(this.getPxPayKey());
+				
+			  	child = doc.createElement("AmountInput");
+			  	root.appendChild(child);	  	
+			  	text = doc.createTextNode(this.getAmountInput());
+			  	child.appendChild(text);
+	
+				System.out.println(this.getAmountInput());
+				
+			  	child = doc.createElement("BillingId");
+			  	root.appendChild(child);		  	
+			  	text = doc.createTextNode(this.getBillingId());
+			  	child.appendChild(text);	  	
+	
+				System.out.println(this.getBillingId());
+				
+			  	child = doc.createElement("CurrencyInput");
+			  	root.appendChild(child);		  	
+			  	text = doc.createTextNode(this.getCurrencyInput());
+			  	child.appendChild(text);	  	
+	
+				System.out.println(this.getCurrencyInput());
+				
+			  	child = doc.createElement("EmailAddress");	
+			  	root.appendChild(child);		  	
+			  	text = doc.createTextNode(this.getEmailAddress());
+			  	child.appendChild(text);	  	
+				System.out.println(this.getEmailAddress());
+				
+			  	child = doc.createElement("EnableAddBillCard");	
+			  	root.appendChild(child);		  	
+			  	text = doc.createTextNode(""+this.getEnableAddBillCard());
+			  	child.appendChild(text);	  	
+				System.out.println(this.getEnableAddBillCard());
+				
+			  	child = doc.createElement("MerchantReference");
+			  	root.appendChild(child);		  	
+			  	text = doc.createTextNode(this.getMerchantReference());
+			  	child.appendChild(text);	
+				System.out.println(this.getMerchantReference());
+				
+			  	child = doc.createElement("Opt");
+			  	root.appendChild(child);		  	
+			  	text = doc.createTextNode(this.getOpt());
+			  	child.appendChild(text);	
+				System.out.println(this.getOpt());
+				
+			  	child = doc.createElement("TxnData1");
+			  	root.appendChild(child);		  	
+			  	text = doc.createTextNode(this.getTxnData1());
+			  	child.appendChild(text);	
+				System.out.println(this.getTxnData1());
+				
+			  	child = doc.createElement("TxnData2");
+			  	root.appendChild(child);		  	
+			  	text = doc.createTextNode(this.getTxnData2());
+			  	child.appendChild(text);	
+				System.out.println(this.getTxnData2());
+				
+			  	child = doc.createElement("TxnData3");
+			  	root.appendChild(child);		  	
+			  	text = doc.createTextNode(this.getTxnData3());
+			  	child.appendChild(text);	
+				System.out.println(this.getTxnData3());
+				
+			  	child = doc.createElement("TxnId");
+			  	root.appendChild(child);		  	
+			  	text = doc.createTextNode(this.getTxnId());
+			  	child.appendChild(text);	
+				System.out.println(this.getTxnId());
+				
+			  	child = doc.createElement("TxnType");
+			  	root.appendChild(child);		  	
+			  	text = doc.createTextNode(this.getTxnType());
+			  	child.appendChild(text);
+				System.out.println(this.getTxnType());
+				
+			  	child = doc.createElement("UrlFail");
+			  	root.appendChild(child);		  	
+			  	text = doc.createTextNode(this.getUrlFail());
+			  	child.appendChild(text);
+				System.out.println(this.getUrlFail());
+				
+			  	child = doc.createElement("UrlSuccess");
+			  	root.appendChild(child);		  	
+			  	text = doc.createTextNode(this.getUrlSuccess());
+			  	child.appendChild(text);	
+				System.out.println(this.getUrlSuccess());
+				
+	
+	
+			  /////////////////
+			  //Output the XML
+	
+			  //set up a transformer
+			  TransformerFactory transfac = TransformerFactory.newInstance();
+			  Transformer trans = transfac.newTransformer();
+			  trans.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+			  trans.setOutputProperty(OutputKeys.INDENT, "yes");
+	
+			  //create string from xml tree
+			  StringWriter sw = new StringWriter();
+			  StreamResult result = new StreamResult(sw);
+			  DOMSource source = new DOMSource(doc);
+			  System.out.println("generated doc:"+doc.toString());
+			  trans.transform(source, result);
+			  
+			  System.out.println("generated srintg:"+sw.toString());
+			  
+			  this.setXml(sw.toString());
+		  }
+		  catch (Exception e)
+		  {
+			  e.printStackTrace();
+		  }
+	}
     public String getPxPayUserId() {
 		return pxPayUserId;
 	}
@@ -376,7 +520,9 @@ public class DPSRequestBean {
 		this.urlSuccess = urlSuccess;
 	}
 
+
 	public String getXml() {
+		
 		this.buildXml();
 		return this.Xml;
 	}

@@ -352,13 +352,13 @@ public class AjaxController {
         return map;
 
     }
-	@JsonView(Views.Public.class)
+
 	@RequestMapping(value = "/listGateways")
-	Map<Integer,Map<String,Object>> listGateways(HttpServletRequest request) throws IOException {
+	ModelAndView listGateways(@ModelAttribute(value="shoppingCart") AlipayWalletVO alipayWalletVO, HttpServletRequest request) throws IOException {
 		 Map<Integer,Map<String,Object>> bigMap = new HashMap<Integer,Map<String,Object>>();
-		 
-		  AlipayWalletVO alipayWalletVO = new AlipayWalletVO();
-		 
+		 ModelAndView model = new ModelAndView("DPGPortal");
+		  //AlipayWalletVO alipayWalletVO = new AlipayWalletVO();
+		  List<String> paymentMethods = new ArrayList<String>();
 		  alipayWalletVO.setInfidigiAccountId( request.getParameter("infidigiAccountId"));
 		  alipayWalletVO.setUser_id(alipayWalletVO.getInfidigiAccountId());
 		  AlipayWalletVO dps = dashboardService.getDPSRecord(alipayWalletVO);
@@ -367,7 +367,7 @@ public class AjaxController {
 		  {
 			  Map<String,Object> map = new LinkedHashMap<String,Object>();
 			  map.put("id", count);
-			    map.put("channel", "DPS");
+			  paymentMethods.add("Payment Express(DPS)");
 			    bigMap.put(count, map);
 			    count++;
 		  }
@@ -377,7 +377,7 @@ public class AjaxController {
 		  {
 			  Map<String,Object> map = new LinkedHashMap<String,Object>();
 			  map.put("id", count);
-			    map.put("channel", "Flo2Cash");
+			  paymentMethods.add("Flo2Cash");
 			    bigMap.put(count, map);
 			    count++;
 		  }
@@ -387,7 +387,7 @@ public class AjaxController {
 		  {
 			  Map<String,Object> map = new LinkedHashMap<String,Object>();
 			  map.put("id", count);
-			    map.put("channel", "POLi");
+			  paymentMethods.add("POLi");
 			    bigMap.put(count, map);
 			    count++;
 		  }
@@ -396,7 +396,7 @@ public class AjaxController {
 		  {
 			  Map<String,Object> map = new LinkedHashMap<String,Object>();
 			  map.put("id", count);
-			    map.put("channel", "CUP");
+			  paymentMethods.add("CUP");
 			    bigMap.put(count, map);
 			    count++;
 		  }
@@ -406,13 +406,15 @@ public class AjaxController {
 		  {
 			  Map<String,Object> map = new LinkedHashMap<String,Object>();
 			  map.put("id", count);
-			    map.put("channel", "Alipay Online");
+			  paymentMethods.add( "Alipay Online");
 			    bigMap.put(count, map);
 			    count++;
 		  }
-		  System.out.println("000000000"+bigMap.get(2));
+		  model.addObject("paymentMethods", paymentMethods);
+		 
+		 model.addObject("amount",alipayWalletVO.getAmount());
 		  System.out.println("000000000"+bigMap.get(1));
-		return bigMap;
+		return  model;
 	}
 	
 }

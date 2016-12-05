@@ -9,6 +9,7 @@ import com.payitnz.model.AlipayAPIRequest;
 import com.payitnz.model.AlipayAPIResponse;
 import com.payitnz.model.AlipayWalletVO;
 import com.payitnz.model.GenericAPIResponse;
+import com.payitnz.model.RequestBean;
 import com.payitnz.model.User;
 
 public interface AlipayAPIDao {
@@ -19,10 +20,7 @@ public interface AlipayAPIDao {
     
     void update(AlipayAPIResponse alipayAPIResponse);
     
-    void save(DPSRequestBean dpsRequest);
 
-    void update(DPSRequestBean dpsRequest);
-    
     User getUser(String infidigiAccountId, String infidigiUserId, String infidigiPassword);
 
     AlipayAPIResponse getTransactionDetailsByPartnerTransactionId(String merchantTransactionId);
@@ -52,6 +50,14 @@ public interface AlipayAPIDao {
 	List<AlipayAPIResponse> getRefundTransactionDetailsByCriteriaWeb(AlipayWalletVO alipayWalletVO);
 
 	List<AlipayAPIResponse> getTransactionsOfID(String mcPartnerTransId);
+
+	void savef2C(RequestBean alipayAPIRequest);
+
+	void savePolireq(RequestBean alipayAPIRequest);
+	
+	void saveCUPreq(RequestBean alipayAPIRequest);
+
+	void save(DPSRequestBean dpsRequest);
 
 //	User getUser(String infidigiUserID);
 

@@ -42,7 +42,7 @@
 </head>
 
 <body>
-	<spring:url value="/callPayemntApi" var="paymentActionUrl" />
+	<spring:url value="/listGateways" var="paymentActionUrl" />
 	<div class="login">
 		<form:form class="login-container" method="post"
 			commandName="ShoppingCart" action="${paymentActionUrl}">
@@ -65,12 +65,7 @@
 			<input type="hidden" name="gateway" id="gateway"/>
 			<br>
 			<br>
-			<label>Payment Gateways :</label>
-			
-				<select id="merList">
-				
-				</select>
-			<br>
+		
 			<br>
 			<label class="col-sm-2 control-label">&nbsp;</label>
 			<input type="button" value="Pay Now" id="pay">
@@ -103,13 +98,13 @@
 		});
 							
 		$("#pay").click(function() {
-			alert("acc"+$("#infidigiAccountId").val());
+		//	alert("acc"+$("#infidigiAccountId").val());
 			var amt = $("#amount").val();
 			var particular = $("#particular").val()
 			var accountId = $("#infidigiAccountId").val();
 			var gateway = $('#merList :selected').text();;
 			var reference = $("#reference").val();
-			alert("accountid"+accountId);
+		//	alert("accountid"+accountId);
 			
 			if (amt == "") {
 				alert("Amount should not be blank.");
@@ -131,7 +126,7 @@
 			
 			if(gateway == 'Alipay Online')
 			{
-				alert("Alipay");
+				//alert("Alipay");
 				$("#gateway").val('Alipay Online');
 				
 			}
@@ -142,7 +137,7 @@
 			}
 			if(gateway == 'Flo2Cash')
 			{
-				alert("Flo2Cash");
+				//alert("Flo2Cash");
 				$("#gateway").val('Flo2Cash');
 			}
 			if(gateway == 'POLi')
@@ -160,7 +155,7 @@
 			
 		});
 		
-		$("#infidigiAccountId").change(function() {
+		$("#infidigiAccountId1").change(function() {
 			var acc_id = $("#infidigiAccountId").val();
 		    
 	         $.ajax({
@@ -171,7 +166,7 @@
 	                    dataType: 'json',
 	                    data: {'infidigiAccountId':acc_id},
 	                     success : function(data) { 
-                           alert("Done");
+                          // alert("Done");
 	                             buildTable(data);       
 	                        },
 	                      error : function(data) {
@@ -188,7 +183,7 @@
                      		  debugger;
                                if(Object.keys(data).length > 0)
                                {
-                            	   alert(Object.keys(data).length);
+                            	   //alert(Object.keys(data).length);
                                	for(i=1;i<=Object.keys(data).length;i++){
                              		
                              		 $('#merList').append($('<option>',

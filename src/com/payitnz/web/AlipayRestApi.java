@@ -2,6 +2,7 @@ package com.payitnz.web;
 
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,6 +17,11 @@ import java.util.TimerTask;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.xml.soap.SOAPConnection;
+import javax.xml.soap.SOAPConnectionFactory;
+import javax.xml.soap.SOAPElement;
+import javax.xml.soap.SOAPException;
+import javax.xml.soap.SOAPMessage;
 
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
@@ -35,6 +41,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.common.gis.Coordinate;
+import com.dynamicpayment.paymentexpress.ASimpleSOAPClient;
+import com.dynamicpayment.paymentexpress.DPSRequestBean;
+import com.dynamicpayment.paymentexpress.PxPay;
 import com.mkyong.common.MailMail;
 import com.payitnz.config.DynamicPaymentConstant;
 import com.payitnz.model.AlipayAPIRequest;
@@ -717,4 +726,22 @@ public class AlipayRestApi {
 //	return t;
 //}
   
+//    @RequestMapping("/dps ")
+//    public GenericAPIResponse DPS(@RequestBody AlipayWalletVO alipayWalletVO, HttpServletRequest request) throws Exception {
+//    	GenericAPIResponse genericAPIResponse = new GenericAPIResponse();
+//    	genericAPIResponse.setAmount("10");
+//    	   SOAPConnectionFactory soapConnectionFactory = SOAPConnectionFactory.newInstance();
+//           SOAPConnection soapConnection = soapConnectionFactory.createConnection();
+//           // Send SOAP Message to SOAP Server
+//           String url = "https://uat.paymentexpress.com/WS/PXWS.asmx";
+//           
+//           final SOAPMessage soapResponse = soapConnection.call(alipayAPIService.createSOAPRequest(), url);
+//
+//           // Process the SOAP Response
+//           alipayAPIService.printSOAPResponse(soapResponse);
+//
+//           soapConnection.close();
+//		return genericAPIResponse;
+//    	
+//    }
 }

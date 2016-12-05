@@ -33,6 +33,7 @@ import com.payitnz.model.ReconcillationBean;
 import com.payitnz.model.ReconcillationFileBean;
 import com.payitnz.model.TransactionBean;
 import com.payitnz.model.User;
+import com.payitnz.util.TwilioSMSApi;
 
 
 @Repository
@@ -51,6 +52,8 @@ public class AlipayReconcillationDaoImpl implements AlipayReconcillationDao {
     JdbcTemplate jdbcTemplate;
     
     MailMail mail = new MailMail();
+    
+    TwilioSMSApi smsApi = new TwilioSMSApi();
 
     @Autowired
     public void setNamedParameterJdbcTemplate(NamedParameterJdbcTemplate namedParameterJdbcTemplate) throws DataAccessException {
@@ -264,6 +267,15 @@ public class AlipayReconcillationDaoImpl implements AlipayReconcillationDao {
 			   	     			 }
 			   	     		 }
 		   	     		
+			   	     		if(alertBean.getIs_settle_reconcile_phone_number()>0){
+			   	     			
+			   	     			String message = "Error reconciling tranasction with id:"+reconcileBean.getPartnerTransactionId()+"!";
+			   	     			String toNumber = alertBean.getSettle_reconcile_phone_number();
+			   	     			if(!toNumber.isEmpty())
+			   	     			smsApi.sendSMSAlert(message,toNumber);
+			   	     			
+			   	     		}
+			   	     		
 		   	     			logger.error("Error reconciling tranasction with id:"+reconcileBean.getPartnerTransactionId()+"!"); 
 		   	     			
 	        		   }			 			
@@ -305,6 +317,16 @@ public class AlipayReconcillationDaoImpl implements AlipayReconcillationDao {
 	   	     				 
 	   	     			 }
 	   	     		 }
+  	     	   		
+	  	     	   	if(alertBean.getIs_settle_reconcile_phone_number()>0){
+	   	     			
+	   	     			String message = "Error reconciling tranasction with id:"+reconcileBean.getPartnerTransactionId()+"!";
+	   	     			String toNumber = alertBean.getSettle_reconcile_phone_number();
+	   	     			if(!toNumber.isEmpty())
+	   	     			smsApi.sendSMSAlert(message,toNumber);
+	   	     			
+	   	     		}
+  	     	   	
 		 	   }
 	           
 	      } catch (EmptyResultDataAccessException e) {

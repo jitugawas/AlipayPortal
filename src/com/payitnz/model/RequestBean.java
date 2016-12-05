@@ -7,14 +7,16 @@ public class RequestBean
 	String userid ;
 	String url;
 	String Amount;
-
+	String mcPartnerTransId;
 	// flo2cash // 
 	
+	
+
 	String cmd;
 	String account_id;
 	String custom_data;
 	String return_url;
-	String notification_url;
+	String f2c_notification_url;
 	String header_image;
 	String header_bottom_border;
 	String header_background_colour;
@@ -22,6 +24,22 @@ public class RequestBean
 	String display_customer_email;
 	String reference ,particular;
 
+	public String getMcPartnerTransId() {
+		return mcPartnerTransId;
+	}
+
+	public void setMcPartnerTransId(String mcPartnerTransId) {
+		this.mcPartnerTransId = mcPartnerTransId;
+	}
+
+
+	public String getF2c_notification_url() {
+		return f2c_notification_url;
+	}
+
+	public void setF2c_notification_url(String f2c_notification_url) {
+		this.f2c_notification_url = f2c_notification_url;
+	}
 	public int getId() {
 		return id;
 	}
@@ -64,7 +82,15 @@ public class RequestBean
 	String SuccessURL;
 	String FailureURL;
 	String CancellationURL;
-	String NotificationURL;
+	String poli_NotificationURL;
+
+	public String getPoli_NotificationURL() {
+		return poli_NotificationURL;
+	}
+
+	public void setPoli_NotificationURL(String poli_NotificationURL) {
+		this.poli_NotificationURL = poli_NotificationURL;
+	}
 
 	public String getCurrencyCode() {
 		return CurrencyCode;
@@ -114,13 +140,7 @@ public class RequestBean
 		CancellationURL = cancellationURL;
 	}
 
-	public String getNotificationURL() {
-		return NotificationURL;
-	}
 
-	public void setNotificationURL(String notificationURL) {
-		NotificationURL = notificationURL;
-	}
 
 	
 	// CUP // 
@@ -392,13 +412,6 @@ public class RequestBean
 		this.return_url = return_url;
 	}
 
-	public String getNotification_url() {
-		return notification_url;
-	}
-
-	public void setNotification_url(String notification_url) {
-		this.notification_url = notification_url;
-	}
 
 	public String getHeader_image() {
 		return header_image;

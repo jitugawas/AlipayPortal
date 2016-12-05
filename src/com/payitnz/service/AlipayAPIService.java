@@ -3,15 +3,17 @@ package com.payitnz.service;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.soap.SOAPElement;
+import javax.xml.soap.SOAPMessage;
 
 import org.springframework.ui.Model;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.dynamicpayment.paymentexpress.DPSRequestBean;
 import com.payitnz.model.AlipayAPIRequest;
 import com.payitnz.model.AlipayAPIResponse;
 import com.payitnz.model.AlipayWalletVO;
 import com.payitnz.model.GenericAPIResponse;
+import com.payitnz.model.RequestBean;
 import com.payitnz.model.User;
 
 public interface AlipayAPIService {
@@ -19,8 +21,6 @@ public interface AlipayAPIService {
     void saveOrUpdate(AlipayAPIRequest alipayAPIRequest);
 
     void saveOrUpdate(AlipayAPIResponse alipayAPIResponse);
-   
-    void saveOrUpdate(DPSRequestBean dpsRequest);    
 
     boolean authenticateUser(AlipayWalletVO alipayWalletVO, String ipAddress, String sender, GenericAPIResponse genericAPIResponse);
 
@@ -81,7 +81,20 @@ public interface AlipayAPIService {
 	Model processF2C(AlipayWalletVO f2c, Model model, AlipayWalletVO alipay, String ipAddress, String sender,
 			HttpServletRequest request);
 
-	String processDPS(AlipayWalletVO dps, Model model, AlipayWalletVO alipay, String ipAddress, String sender,
+	String processPoli(AlipayWalletVO alipayWalletVO, Model model, AlipayWalletVO poli, String ipAddress, String sender,
 			HttpServletRequest request);
+	
+	void savef2cReq(RequestBean alipayAPIRequest);
+
+	void savePoliReq(RequestBean alipayAPIRequest);
+
+	void saveCUPReq(RequestBean alipayAPIRequest);
 //	User getUser(String infidigiUserID);
+
+	String processDPS(AlipayWalletVO alipay, Model model, AlipayWalletVO dps, String ipAddress, String sender,
+			HttpServletRequest request);
+
+//	SOAPMessage createSOAPRequest();
+
+	void printSOAPResponse(SOAPMessage soapResponse) throws Exception;
 }
